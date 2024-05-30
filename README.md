@@ -55,7 +55,7 @@ Key Features:
 1. **Clone the Repository:**
    
    ```bash
-   git clone https://github.com/your-repository/update-apps-with-winget.git
+   git clone https://github.com/Deakin-Carr/Enterprise-Winget-Updates.git
    cd update-apps-with-winget
    ```
 
