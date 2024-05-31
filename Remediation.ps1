@@ -8,7 +8,7 @@
 	 Organization: 	UtilitiseIT PTY LTD
 	 Filename:     	Remediation
      Tenant:        
-	 Version:		1.0.8
+	 Version:		1.0.9
 	===========================================================================
 	.DESCRIPTION
 		A description of the file.
@@ -25,10 +25,12 @@
 
 # Initialize log file names and paths
 $WorkingDirectory = "$env:HOMEDRIVE\Temp"
-$ScriptName = "Remediation_Update_Apps_With_Winget_1.0.8"
+$ScriptName = "Remediation_Update_Apps_With_Winget_1.0.9"
 $Stamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $TempLogs = "$WorkingDirectory\Logs\$Stamp`_$env:COMPUTERNAME`_$env:USERNAME`_$ScriptName.txt"
 Start-Transcript -Path $TempLogs
+
+$SYSTEM_MODE = $True
 
 function Remove-ContinuousNonAsciiSequences {
     param (
@@ -247,6 +249,11 @@ $AppCheck += New-Object PSObject -Property @{
     PackageName = 'Oracle.JavaRuntimeEnvironment'
     Action = "Skip"
     Reason = "Unknown"
+}
+$AppCheck += New-Object PSObject -Property @{
+    PackageName = 'Microsoft.RemoteDesktopClient'
+    Action = "Skip"
+    Reason = "Application kicks people off when updated"
 }
 $AppCheck += New-Object PSObject -Property @{
     PackageName = 'Microsoft.Office'
