@@ -3,12 +3,12 @@
 	===========================================================================
 	 Created with: 	PowerShell
 	 Created on:   	22/05/2024 3:30 PM
-	 Modified on:	31/05/2024
+	 Modified on:	03/06/2024
 	 Created by:    DeakinCarr
 	 Organization: 	UtilitiseIT PTY LTD
 	 Filename:     	Remediation
      Tenant:        
-	 Version:		1.0.9
+	 Version:		1.1.0
 	===========================================================================
 	.DESCRIPTION
 		A description of the file.
@@ -20,12 +20,13 @@
         - 1.0.7 - Changed blacklist to skip everything titled 'Microsoft.VC*'
         - 1.0.8 - Changed the way the end position is determined
         - 1.0.9 - Added a way to change install context and swapped the name of the blacklist variable
+        - 1.1.0 - Fixed a bug that users cant run winget if they have multiple wingets installed
 #>
  
 
 # Initialize log file names and paths
 $WorkingDirectory = "$env:HOMEDRIVE\Temp"
-$ScriptName = "Remediation_Update_Apps_With_Winget_1.0.9"
+$ScriptName = "Remediation_Update_Apps_With_Winget_1.1.0"
 $Stamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $TempLogs = "$WorkingDirectory\Logs\$Stamp`_$env:COMPUTERNAME`_$env:USERNAME`_$ScriptName.txt"
 Start-Transcript -Path $TempLogs
@@ -57,6 +58,8 @@ try {
 switch ($SYSTEM_MODE) {
     $True {
         $Winget = Get-ChildItem -Path "C:\Program Files\WindowsApps" | Where-Object {$_.Name -like "Microsoft.DesktopAppInstaller_*x64__8wekyb3d8bbwe"} | Get-ChildItem | Where-Object {$_.Name -eq "winget.exe"}
+        # Sometimes a user has more than one winget version installed for some reason, so we just want the latest version
+        $Winget = $Winget[$Winget.Count - 1]
     }
     $false {
         $Winget = "winget"
