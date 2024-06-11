@@ -239,7 +239,7 @@ try {
     $Apps = $upgradableApps[$startPos..$endPos] | foreach-Object { Parse-Winget-Line $_ }
     $Apps | foreach-Object { Check-Updates $_ $AppCheck -Verbose }
 
-    Write-Host "Well if you made it here I don't think updates are required!"
+    Write-Host "No updates required!"
     Stop-Transcript
     exit 0
 }

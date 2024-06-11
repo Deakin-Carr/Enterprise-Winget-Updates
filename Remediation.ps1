@@ -209,9 +209,15 @@ function Update-App {
             $update = (. "$($WingetPath)" update "$($App.appname)" --disable-interactivity --accept-package-agreements --accept-source-agreements --force --verbose)
         }
 
-        # Sometimes Winget hits a fatal error, or find an incompatible version when trying to update.
+        # Sometimes Winget hits a fatal error, or find an incompatible version when trying to update, or requires uninstallation before it can update again.
         # This steps checks if that is the case, and changes the upgrade method to ---uninstall-previous before it reinstalls the application.
-        if (($update -like "Installer failed with exit code: 1603") -or ($update -like "Another version of this application is already installed.")) {
+
+        $RequireUninstallation = $false
+        if ($update -like "Please uninstall the package and install the newer version") { $RequireUninstallation = $True }
+        if ($update -like "Installer failed with exit code: 1603") { $RequireUninstallation = $True }
+        if ($update -like "Another version of this application is already installed.") { $RequireUninstallation = $True }
+
+        if ($RequireUninstallation) {
             ($update) -split "`n" | where-Object { -not $_.startsWith("  ")}
             Write-Host "The MSI is having a fatal error, will uninstall then reinstall..."
             $update = (. "$($WingetPath)" update "$($App.appname)" --disable-interactivity --accept-package-agreements --accept-source-agreements --force --verbose --uninstall-previous)
