@@ -3,12 +3,12 @@
 	===========================================================================
 	 Created with: 	PowerShell
 	 Created on:   	22/05/2024 3:30 PM
-	 Modified on:	03/06/2024
+	 Modified on:	12/06/2024
 	 Created by:    DeakinCarr
 	 Organization: 	UtilitiseIT PTY LTD
 	 Filename:     	Remediation
      Tenant:        
-	 Version:		1.1.0
+	 Version:		1.1.1
 	===========================================================================
 	.DESCRIPTION
 		A description of the file.
@@ -21,12 +21,13 @@
         - 1.0.8 - Changed the way the end position is determined
         - 1.0.9 - Added a way to change install context and swapped the name of the blacklist variable
         - 1.1.0 - Fixed a bug that users cant run winget if they have multiple wingets installed
+        - 1.1.1 - Fixed a bug that was causing the uninstallation steps to fail due to lack of wild card characters
 #>
  
 
 # Initialize log file names and paths
 $WorkingDirectory = "$env:HOMEDRIVE\Temp"
-$ScriptName = "Remediation_Update_Apps_With_Winget_1.1.0"
+$ScriptName = "Remediation_Update_Apps_With_Winget_1.1.1"
 $Stamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $TempLogs = "$WorkingDirectory\Logs\$Stamp`_$env:COMPUTERNAME`_$env:USERNAME`_$ScriptName.txt"
 Start-Transcript -Path $TempLogs
@@ -213,9 +214,9 @@ function Update-App {
         # This steps checks if that is the case, and changes the upgrade method to ---uninstall-previous before it reinstalls the application.
 
         $RequireUninstallation = $false
-        if ($update -like "Please uninstall the package and install the newer version") { $RequireUninstallation = $True }
-        if ($update -like "Installer failed with exit code: 1603") { $RequireUninstallation = $True }
-        if ($update -like "Another version of this application is already installed.") { $RequireUninstallation = $True }
+        if ($update -like "*Please uninstall the package and install the newer version*") { $RequireUninstallation = $True }
+        if ($update -like "*Installer failed with exit code: 1603*") { $RequireUninstallation = $True }
+        if ($update -like "*Another version of this application is already installed*") { $RequireUninstallation = $True }
 
         if ($RequireUninstallation) {
             ($update) -split "`n" | where-Object { -not $_.startsWith("  ")}
